@@ -3,6 +3,14 @@ PROTOCOL_VERSION_MINOR = 0
 
 from cobs import cobs
 from crc8 import crc8
+from enum import Enum
+
+class requestType(Enum):
+    HELLO = 1
+    GET_MACHINE_INFO = 2
+    GET_STATUS = 3
+    START_PROGRAM = 4
+    ABORT_PROGRAM = 5
 
 class comProtocol:
     def __init__(self):
