@@ -1,6 +1,7 @@
 PROTOCOL_VERSION_MAJOR = 1
 PROTOCOL_VERSION_MINOR = 0
 
+from dishwasher import Machine
 from cobs import cobs
 from crc8 import crc8
 from enum import Enum
@@ -13,8 +14,9 @@ class requestType(Enum):
     ABORT_PROGRAM = 5
 
 class comProtocol:
-    def __init__(self):
+    def __init__(self, machine:Machine):
         self.sequence = 0
+        self.machine = machine
         self.ignore_sequence_number = False
         self.insert_crc_error = False
         self.no_response = False
@@ -46,6 +48,8 @@ class comProtocol:
         match data[3]:
             case requestType.HELLO.value:
                 await self.__on_hello_request()
+            case requestType.GET_MACHINE_INFO.value:
+                await self.__on_get_machine_info_request()
             case _:
                 await self.__response_callback(b'\x00')
 
@@ -80,6 +84,29 @@ class comProtocol:
         payload.append(PROTOCOL_VERSION_MAJOR)
         payload.append(PROTOCOL_VERSION_MINOR)
         
+        packet = self.__build_packet(payload)
+
+        if(self.__response_callback is None):
+            return
+        
+        if(self.no_response):
+            return
+        
+        await self.__response_callback(packet)
+
+    async def __on_get_machine_info_request(self):
+
+        payload = b''
+        info = self.machine.getInfo()
+        payload += info[0].encode("ascii")
+        payload += b'\x00'
+        payload += info[1].encode("ascii")
+        payload += b'\x00'
+        payload += info[2].encode("ascii")
+        payload += b'\x00'
+        payload += info[3].encode("ascii")
+        payload += b'\x00'
+    
         packet = self.__build_packet(payload)
 
         if(self.__response_callback is None):

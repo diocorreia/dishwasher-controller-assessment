@@ -2,14 +2,15 @@
 
 import asyncio
 
+from dishwasher import Machine
 from fakeSerial import FakeSerial
 from comProtocol import comProtocol
 from dishwasher import Machine
 from shell import Shell
 
-serial = FakeSerial()
-com = comProtocol()
 dishwasher = Machine()
+serial = FakeSerial()
+com = comProtocol(dishwasher)
 shell = Shell(dishwasher)
 
 async def main():
