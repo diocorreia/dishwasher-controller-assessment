@@ -17,6 +17,7 @@ class comProtocol:
         self.sequence = 0
         self.ignore_sequence_number = False
         self.insert_crc_error = False
+        self.no_response = False
 
     def set_response_callback(self, callback):
         self.__response_callback = callback
@@ -43,6 +44,8 @@ class comProtocol:
 
         # Check request
         match data[3]:
+            case requestType.HELLO.value:
+                await self.__on_hello_request()
             case _:
                 await self.__response_callback(b'\x00')
 
@@ -70,3 +73,19 @@ class comProtocol:
         packet = cobs.encode(packet) + b'\x00' 
 
         return packet
+
+    async def __on_hello_request(self):
+
+        payload = bytearray()
+        payload.append(PROTOCOL_VERSION_MAJOR)
+        payload.append(PROTOCOL_VERSION_MINOR)
+        
+        packet = self.__build_packet(payload)
+
+        if(self.__response_callback is None):
+            return
+        
+        if(self.no_response):
+            return
+        
+        await self.__response_callback(packet)
