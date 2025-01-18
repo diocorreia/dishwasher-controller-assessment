@@ -4,9 +4,13 @@ import asyncio
 
 from fakeSerial import FakeSerial
 from comProtocol import comProtocol
+from dishwasher import Machine
+from shell import Shell
 
 serial = FakeSerial()
 com = comProtocol()
+dishwasher = Machine()
+shell = Shell(dishwasher)
 
 async def main():
     print("Dishwasher Simulator")
@@ -17,9 +21,11 @@ async def main():
     # Set function to be called by the communication module to send packets
     com.set_response_callback(serial.send)
 
+    shellTask = asyncio.create_task(shell.run())
     communicationTask = asyncio.create_task(serial.run())
 
     await communicationTask
+    await shellTask
 
 
 if __name__ == "__main__":
