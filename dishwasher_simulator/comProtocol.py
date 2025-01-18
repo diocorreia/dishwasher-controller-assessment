@@ -16,6 +16,7 @@ class comProtocol:
     def __init__(self):
         self.sequence = 0
         self.ignore_sequence_number = False
+        self.insert_crc_error = False
 
     def set_response_callback(self, callback):
         self.__response_callback = callback
@@ -50,3 +51,22 @@ class comProtocol:
                 self.sequence = 0
             else:
                 self.sequence = sequence + 1
+
+    def __build_packet(self, payload):
+        
+        packet = b''
+
+        packet_len = len(payload) + 3
+        packet = packet_len.to_bytes() + self.sequence.to_bytes() + payload
+
+        if(self.insert_crc_error is True):
+            crc = crc8(packet)
+            crc.update(b'\x01')
+            crc = crc.digest()
+        else:
+            crc = crc8(packet).digest()
+
+        packet = crc + packet
+        packet = cobs.encode(packet) + b'\x00' 
+
+        return packet
