@@ -1,7 +1,7 @@
 PROTOCOL_VERSION_MAJOR = 1
 PROTOCOL_VERSION_MINOR = 0
 
-from dishwasher import Machine
+from dishwasher import Machine, Error, Warning
 from cobs import cobs
 from crc8 import crc8
 from enum import Enum
@@ -50,6 +50,8 @@ class comProtocol:
                 await self.__on_hello_request()
             case requestType.GET_MACHINE_INFO.value:
                 await self.__on_get_machine_info_request()
+            case requestType.GET_STATUS.value:
+                await self.__on_get_status_request()
             case _:
                 await self.__response_callback(b'\x00')
 
@@ -107,6 +109,40 @@ class comProtocol:
         payload += info[3].encode("ascii")
         payload += b'\x00'
     
+        packet = self.__build_packet(payload)
+
+        if(self.__response_callback is None):
+            return
+        
+        if(self.no_response):
+            return
+        
+        await self.__response_callback(packet)
+
+    async def __on_get_status_request(self):
+
+        status = self.machine.getStatus()
+
+        payload_msb = ((status['program'].value & 7) << 5)
+        payload_msb |= ((status['step'].value & 7) << 2)
+        payload_msb |= (status['state'].value & 3)
+
+        payload_lsb = 0
+        for warning in status['warnings']:
+            if(warning == Warning.SALT_LEVEL_LOW):
+                payload_lsb |= 128
+            if(warning == Warning.RINSE_AGENT_LOW):
+                payload_lsb |= 64
+
+        for error in status['errors']:
+            if(error == Error.PUMP_JAMMED):
+                payload_lsb |= 8
+            if(error == Error.WATER_SUPPLY_CLOSED):
+                payload_lsb |= 4
+
+        payload = bytearray([payload_msb, payload_lsb])
+        # print(payload.hex())
+
         packet = self.__build_packet(payload)
 
         if(self.__response_callback is None):
