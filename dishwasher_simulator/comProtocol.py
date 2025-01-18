@@ -54,6 +54,8 @@ class comProtocol:
                 await self.__on_get_status_request()
             case requestType.START_PROGRAM.value:
                 await self.__on_start_program_request(data[4])
+            case requestType.ABORT_PROGRAM.value:
+                await self.__on_abort_program_request()
             case _:
                 await self.__response_callback(b'\x00')
 
@@ -160,6 +162,20 @@ class comProtocol:
         self.machine.setProgram(Program(program))
         self.machine.start()
 
+        packet = self.__build_packet(b'\x00')
+
+        if(self.__response_callback is None):
+            return
+
+        if(self.no_response):
+            return
+
+        await self.__response_callback(packet)
+
+    async def __on_abort_program_request(self):
+
+        self.machine.restart()
+                
         packet = self.__build_packet(b'\x00')
 
         if(self.__response_callback is None):
