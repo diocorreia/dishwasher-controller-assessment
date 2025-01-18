@@ -1,7 +1,7 @@
 PROTOCOL_VERSION_MAJOR = 1
 PROTOCOL_VERSION_MINOR = 0
 
-from dishwasher import Machine, Error, Warning
+from dishwasher import Machine, Error, Warning, Program
 from cobs import cobs
 from crc8 import crc8
 from enum import Enum
@@ -52,6 +52,8 @@ class comProtocol:
                 await self.__on_get_machine_info_request()
             case requestType.GET_STATUS.value:
                 await self.__on_get_status_request()
+            case requestType.START_PROGRAM.value:
+                await self.__on_start_program_request(data[4])
             case _:
                 await self.__response_callback(b'\x00')
 
@@ -151,4 +153,19 @@ class comProtocol:
         if(self.no_response):
             return
         
+        await self.__response_callback(packet)
+
+    async def __on_start_program_request(self, program):
+
+        self.machine.setProgram(Program(program))
+        self.machine.start()
+
+        packet = self.__build_packet(b'\x00')
+
+        if(self.__response_callback is None):
+            return
+
+        if(self.no_response):
+            return
+
         await self.__response_callback(packet)
