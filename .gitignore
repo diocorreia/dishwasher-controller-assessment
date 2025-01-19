@@ -1,0 +1,8 @@
+# VSCode folders
+.vscode
+
+# Python
+__pycache__
+
+# C
+*.o
