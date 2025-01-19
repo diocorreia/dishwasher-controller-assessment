@@ -2,6 +2,9 @@ OPTIONS=-Wall -Werror
 
 INC+= -Iinclude -Iexternal/nanocobs
 
+sample: packet.o nanocobs.o serial_simulator.o dishwasher.o
+	$(CC) $(INC) sample.c $^ -o $@ $(OPTIONS)
+
 tests: test_serial test_packet test_dishwasher
 
 test_serial: serial_simulator.o
