@@ -1,0 +1,3 @@
+[submodule "controller/external/nanocobs"]
+	path = controller/external/nanocobs
+	url = https://github.com/charlesnicholson/nanocobs.git
