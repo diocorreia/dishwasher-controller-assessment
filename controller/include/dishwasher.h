@@ -56,7 +56,8 @@ typedef struct dishwasher_info_s {
 
 /** @brief Initializes dishwasher module
  * 
- *  @retval 0 dishwasher module successfully intialized.
+ *  @retval 0 dishwasher module successfully initalized.
+ *  @retval -DISHWASHER_ERROR_INIT failed to initialize serial communication.
  *  @retval -DISHWASHER_ERROR_REQUEST failed to get version of communication protocol.
  *  @retval -DISHWASHER_ERROR_VERSION machine is using different version of communication protocol.
 */

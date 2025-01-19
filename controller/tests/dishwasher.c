@@ -25,8 +25,8 @@ void test_dishwasher_get_machine_info_success(void){
     assert(dishwasher_get_machine_info(&m_info) == 0);
     assert(strcmp(m_info.machine_type, "Octomat Pro IV\0") == 0);
     assert(strcmp(m_info.hw_version, "Octo Base 2 Rev. 3\0") == 0);
-    assert(strcmp(m_info.fw_version,"01.0.15\0") == 0);
-    assert(strcmp(m_info.serial,"01987639\0") == 0);
+    assert(strcmp(m_info.fw_version,"1.0.15\0") == 0);
+    assert(strcmp(m_info.serial,"1987639\0") == 0);
     dishwasher_uninit();
 }
 
