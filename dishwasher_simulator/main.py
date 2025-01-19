@@ -11,7 +11,7 @@ from shell import Shell
 dishwasher = Machine()
 serial = FakeSerial()
 com = comProtocol(dishwasher)
-shell = Shell(dishwasher)
+shell = Shell(dishwasher, com)
 
 async def main():
     print("Dishwasher Simulator")

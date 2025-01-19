@@ -5,9 +5,10 @@ from comProtocol import comProtocol
 
 class Shell():
 
-    def __init__(self, machine:Machine):
+    def __init__(self, machine:Machine, com:comProtocol):
         self.session = PromptSession(message='dishwasher> ')
         self.machine = machine
+        self.com = com
         self.commands = {
             'start' : self.start,
             'program' : self.set_program,
@@ -17,6 +18,8 @@ class Shell():
             'error' : self.set_error,
             'warning' : self.set_warning,
             'clear' : self.clear_warnings_errors,
+            'communication' : self.communication_menu,
+            'com' : self.communication_menu,
             'info' : self.print_info,
             'help' : self.help,
             'h' : self.help
@@ -132,21 +135,65 @@ class Shell():
         elif(input[1] == 'warnings'):
             self.machine.clearAllWarnings()
 
+    def communication_menu(self, input:list):
+
+        commands = {
+            'sequence' : self.com_set_sequence,
+            'crc_error' : self.com_crc_error,
+            'response' : self.com_response,
+        }
+
+        cmd = input[1]
+
+        try:
+            commands[cmd](input)
+        except:
+            print("Invalid command.")
+
+    def com_set_sequence(self, input:list):
+        if(input[2] == 'off'):
+            self.com.ignore_sequence_number = True
+        elif(input[2] == 'on'):
+            self.com.ignore_sequence_number = False
+        else:
+            print("Invalid argument: sequence on/off")
+
+    def com_crc_error(self, input:list):
+        if(input[2] == 'off'):
+            self.com.insert_crc_error = False
+        elif(input[2] == 'on'):
+            self.com.insert_crc_error = True
+        else:
+            print("Invalid argument: crc_error on/off")
+
+    def com_response(self, input:list):
+        if(input[2] == 'off'):
+            self.com.no_response = True
+        elif(input[2] == 'on'):
+            self.com.no_response = False
+        else:
+            print("Invalid argument: response on/off")
+
     def help(self, input:list):
-        help = "\nCommand\t\t\t\tDescription\n" + \
-        "================================================================\n"  + \
-        "info\t\t\t\tPrints dishwasher info\n" + \
-        "start\t\t\t\tStarts dishwasher program\n" + \
-        "program\tECO_50DEG\t\tSets dishwasher program\n" + \
+        help = "\nCommand\t\t\t\t\tDescription\n" + \
+        "=================================================================================\n"  + \
+        "info\t\t\t\t\tPrints dishwasher info\n" + \
+        "start\t\t\t\t\tStarts dishwasher program\n" + \
+        "program\tECO_50DEG\t\t\tSets dishwasher program\n" + \
         "\tNORMAL_60DEG\n" + \
         "\tHIGH_60DEG\n" + \
         "\tHIGH_70DEG\n" + \
-        "restart\t\t\t\tRestarts dishwasher\n" + \
-        "error\tPUMP_JAMMED\t\tSets error\n" + \
+        "restart\t\t\t\t\tRestarts dishwasher\n" + \
+        "error\tPUMP_JAMMED\t\t\tSets error\n" + \
         "\tWATER_SUPPLY_CLOSED\n" + \
-        "warning\tSALT_LEVEL_LOW\t\tSets warning\n" + \
+        "warning\tSALT_LEVEL_LOW\t\t\tSets warning\n" + \
         "\tRINSE_AGENT_LOW\n" + \
-        "clear\t\t\t\tClears all warnings and errors\n" + \
-        "\twarnings\t\tClears all warnings\n" + \
-        "\terrors\t\t\tClears all errors\n"
+        "clear\t\t\t\t\tClears all warnings and errors\n" + \
+        "\twarnings\t\t\tClears all warnings\n" + \
+        "\terrors\t\t\t\tClears all errors\n" + \
+        "communication" + \
+        "\tsequence  [on/off]\tEnable/Disable sequence counting\n" + \
+        "\t\tcrc_error [on/off]\tEnable/Disable checksum error injection\n" + \
+        "\t\tresponse  [on/off]\tEnable/Disable response\n" + \
+        "=================================================================================\n"
         print(help)
