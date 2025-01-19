@@ -29,4 +29,4 @@ dishwasher.o: packet.o serial_simulator.o
 	$(CC) $(INC) -c dishwasher.c -o $@ $(OPTIONS)
 
 clean:
-	rm -rf *.o test_serial
+	rm -rf *.o sample test_serial test_dishwasher test_packet
