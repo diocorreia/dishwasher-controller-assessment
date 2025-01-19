@@ -8,6 +8,12 @@ This connectivity module is separated from the dishwasher controller. These two 
 
 This repository comprises of two parts: the connectivity module library (in C); And a dishwasher simulator (in Python).
 
+## System Architecture
+![system architecture](../media/system_architecture.png?raw=true)
+
+## Dishwasher simulator
+![simulator screenshot](../media/dishwasher_simulator.png?raw=true)
+
 # How to build/use project
 ## Dishwasher Simulator
 
